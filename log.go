@@ -49,7 +49,6 @@ func logf(level LogLevel, color string, format string, v ...interface{}) {
 		return
 	}
 
-	// 拼接颜色代码
 	prefix := ""
 	suffix := ""
 	if color != "" {
@@ -57,12 +56,10 @@ func logf(level LogLevel, color string, format string, v ...interface{}) {
 		suffix = "\033[0m" // 重置颜色
 	}
 
-	//输出日志
 	log.Printf("%s[%s] %s%s\n", prefix, levelName(level), fmt.Sprintf(format, v...), suffix)
 
 }
 
-// 各级别日志输出函数
 func DebugF(format string, v ...interface{}) {
 	logf(DebugLevel, "32", format, v...) // 32=绿色
 }
