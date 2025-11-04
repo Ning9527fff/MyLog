@@ -1,10 +1,11 @@
-package main
+package MyLog
 
 import (
 	"fmt"
+	"testing"
 )
 
-func TestLog() {
+func TestLog(testing *testing.T) {
 
 	testMessage := "Test Message"
 
