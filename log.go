@@ -23,10 +23,10 @@ const (
 
 var (
 	currentLogLevel LogLevel
-	logEnabled      bool = true // 日志开关，默认开启
-	fileLogEnabled  bool = false // 文件日志开关，默认关闭
-	logFile         *os.File     // 日志文件句柄
-	logFilePath     string       // 日志文件路径
+	logEnabled      bool     = true  // 日志开关，默认开启
+	fileLogEnabled  bool     = false // 文件日志开关，默认关闭
+	logFile         *os.File         // 日志文件句柄
+	logFilePath     string           // 日志文件路径
 	mu              sync.Mutex
 )
 
@@ -43,20 +43,12 @@ func SetLogEnabled(enabled bool) {
 	logEnabled = enabled
 }
 
-// EnableLog 开启日志，如果文件日志未初始化则自动初始化
+// EnableLog 开启日志
 func EnableLog() error {
 	mu.Lock()
 	defer mu.Unlock()
 
 	logEnabled = true
-
-	// 如果文件日志未初始化，自动初始化
-	if logFile == nil {
-		if err := initFileLogInternal(); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -127,12 +119,20 @@ func InitFileLog() error {
 }
 
 // EnableFileLog 开启文件日志（需要先调用 SetLogFile 设置文件路径）
-func EnableFileLog() {
+func EnableFileLog() error {
 	mu.Lock()
 	defer mu.Unlock()
+	// 如果文件日志未初始化，自动初始化
+	if logFile == nil {
+		if err := initFileLogInternal(); err != nil {
+			return err
+		}
+	}
+
 	if logFile != nil {
 		fileLogEnabled = true
 	}
+	return nil
 }
 
 // DisableFileLog 关闭文件日志
