@@ -78,13 +78,21 @@ func TestWarnF(t *testing.T) {
 func TestLogSwitch(t *testing.T) {
 	fmt.Println("\n========== 测试日志开关 ==========")
 
-	EnableLog()
+	// 清理测试目录
+	defer os.RemoveAll("log")
+	defer CloseLogFile()
+
+	if err := EnableLog(); err != nil {
+		t.Fatalf("EnableLog 失败: %v", err)
+	}
 	InfoF("日志已开启")
 
 	DisableLog()
 	InfoF("这条日志不应该显示")
 
-	EnableLog()
+	if err := EnableLog(); err != nil {
+		t.Fatalf("EnableLog 失败: %v", err)
+	}
 	InfoF("日志重新开启")
 }
 

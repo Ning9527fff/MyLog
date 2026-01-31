@@ -43,9 +43,21 @@ func SetLogEnabled(enabled bool) {
 	logEnabled = enabled
 }
 
-// EnableLog 开启日志
-func EnableLog() {
-	SetLogEnabled(true)
+// EnableLog 开启日志，如果文件日志未初始化则自动初始化
+func EnableLog() error {
+	mu.Lock()
+	defer mu.Unlock()
+
+	logEnabled = true
+
+	// 如果文件日志未初始化，自动初始化
+	if logFile == nil {
+		if err := initFileLogInternal(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // DisableLog 关闭日志
@@ -76,11 +88,8 @@ func SetLogFile(filePath string) error {
 	return nil
 }
 
-// InitFileLog 初始化文件日志，以时间戳命名，保存在 log 目录下
-func InitFileLog() error {
-	mu.Lock()
-	defer mu.Unlock()
-
+// initFileLogInternal 内部函数：初始化文件日志（不加锁）
+func initFileLogInternal() error {
 	// 如果已有打开的文件，先关闭
 	if logFile != nil {
 		logFile.Close()
@@ -108,6 +117,13 @@ func InitFileLog() error {
 	logFilePath = filePath
 	fileLogEnabled = true
 	return nil
+}
+
+// InitFileLog 初始化文件日志，以时间戳命名，保存在 log 目录下
+func InitFileLog() error {
+	mu.Lock()
+	defer mu.Unlock()
+	return initFileLogInternal()
 }
 
 // EnableFileLog 开启文件日志（需要先调用 SetLogFile 设置文件路径）
